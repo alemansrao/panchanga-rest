@@ -1,0 +1,74 @@
+# ==========================
+# Django / Python
+# ==========================
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+
+# If using SQLite with multiple environments
+*.sqlite3
+
+# Local settings (optional)
+local_settings.py
+settings_local.py
+.env
+
+# Media & static (if collected locally)
+media/
+staticfiles/
+static/
+
+# Django migrations (optional – uncomment if you want to ignore them)
+# */migrations/
+# !*/migrations/__init__.py
+
+# ==========================
+# Virtual Environment
+# ==========================
+venv/
+env/
+ENV/
+.virtualenv/
+.venv/
+
+# ==========================
+# VS Code / PyCharm
+# ==========================
+.vscode/
+.idea/
+
+# ==========================
+# OS Specific
+# ==========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*.swp
+*.swo
+
+# ==========================
+# Compiled / Distribution
+# ==========================
+build/
+dist/
