@@ -152,9 +152,9 @@ class PanchangaAPI(APIView):
 
                 planets[name] = {
                     "longitude_deg": round(lon_sid, 6),
-                    "longitude_dms": dms(lon_sid),
+                    # "longitude_dms": dms(lon_sid),
                     "rashi_sa": rashi_name_sa(si),
-                    "rashi_en": rashi_name_en(si),
+                    # "rashi_en": rashi_name_en(si),
                     "house": ((si - lagna_idx) % 12) + 1,
                 }
 
@@ -164,9 +164,9 @@ class PanchangaAPI(APIView):
             ketu_si = sign_index(ketu_lon)
             planets["Ketu"] = {
                 "longitude_deg": round(ketu_lon, 6),
-                "longitude_dms": dms(ketu_lon),
+                # "longitude_dms": dms(ketu_lon),
                 "rashi_sa": rashi_name_sa(ketu_si),
-                "rashi_en": rashi_name_en(ketu_si),
+                # "rashi_en": rashi_name_en(ketu_si),
                 "house": ((ketu_si - lagna_idx) % 12) + 1,
             }
 
