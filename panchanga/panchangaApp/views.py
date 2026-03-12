@@ -40,15 +40,104 @@ FLAGS = swe.FLG_SWIEPH | swe.FLG_SIDEREAL  # For sidereal planetary longitudes
 
 class PanchangaAPI(APIView):
     """
+    Panchanga API
+
+    Base URL:
+      POST /panchanga/
+      GET  /panchanga/
+
+    Summary:
+      - **GET**: health-check endpoint, returns `{ "status": "ok" }` with HTTP 200.
+      - **POST**: computes Panchanga and chart basics for a given date/time/location using Swiss Ephemeris.
+
+    ---
     POST /panchanga/
 
-    Optional fields to match *any* external software exactly:
+    Request (JSON):
+      Required:
+        - date (string, YYYY-MM-DD)
+            • Local calendar date at the selected location/timezone.
+        - time (string, HH:MM)
+            • Local time in 24h format.
+        - location (string)
+            • City key present in CITY_DB (e.g., "bangalore", "chennai").
+      Optional:
+        - timezone (string, IANA TZ like "Asia/Kolkata")
+            • Overrides the city's default timezone if supplied.
+        - ayanamsa (string)
+            • One of: "lahiri" | "chitrapaksha" | "raman" | "kp" | "krishnamurti" | "fagan" | "fagan-bradley" | "yukteswar" | "sassanian" | "surya_siddhanta"
+            • NOTE: Currently the implementation defaults to Lahiri internally; future changes may wire this fully.
+        - ayanamsa_offset (number, degrees)
+            • If provided, intended to override ayanamsa mode with a custom numeric offset. (Not applied in current code path.)
 
-      "ayanamsa": "lahiri" | "raman" | "kp" | ...
-      "ayanamsa_offset": 0.883   ← custom offset (degrees)
+    Behavior:
+      1) Validates input via PanchangaInputSerializer.
+      2) Resolves city → (lat, lon, tz) from CITY_DB; optional 'timezone' overrides tz.
+      3) Converts local date/time to UTC Julian Day (jd_ut) using `to_utc_jd`.
+      4) Computes sunrise/sunset for given date at location using Swiss Ephemeris (`swe.rise_trans`) around local midnight.
+      5) Sets sidereal mode (currently Lahiri) and gets ayanamsa numeric value.
+      6) Computes ascendant (Lagna) correctly via `swe.houses` and converts to sidereal longitude.
+      7) Computes sidereal longitudes for key grahas: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu; derives Ketu as opposite Rahu.
+      8) Computes Panchanga elements: Tithi, Nakshatra (with start/end local times), Yoga, Karana; also Sauramana/Chandramana rashis.
+      9) Returns a structured JSON response.
 
-    If you provide ayanamsa_offset, it overrides everything else.
+    Response (JSON):
+      {
+        "date": "YYYY-MM-DD",                 // Local date
+        "time": "HH:MM",                      // Local time
+        "weekday": "Monday" | ...,
+        "timezone": "Asia/Kolkata",
+        "ayanamsa_mode": "lahiri",            // Effective chosen mode label
+        "ayanamsa_value_deg": <number>,       // Numeric ayanamsa used (degrees)
+        "lagna": {
+          "sign_sa": "<Sanskrit Rashi Name>",
+          "sign_en": "<English Rashi Name>",
+          "longitude_deg": <number>,          // Sidereal Ascendant longitude (deg)
+          "longitude_dms": "DDD°MM′SS″"       // DMS format
+        },
+        "tithi": "<Tithi Name>",
+        "nakshatra": {
+          "name": "<Nakshatra Name>",
+          "from": "YYYY-MM-DD HH:MM",         // Local time
+          "to": "YYYY-MM-DD HH:MM"            // Local time
+        },
+        "yoga": "<Yoga Name>",
+        "karana": "<Karana Name>",
+        "sauramana": "<Sun's Rashi (Sanskrit)>",
+        "chandramana": "<Moon's Rashi (Sanskrit)>",
+        "sunrise": "YYYY-MM-DD HH:MM",        // Local time
+        "sunset": "YYYY-MM-DD HH:MM",         // Local time
+        "planets": {
+          "<PlanetName>": {
+            "longitude_deg": <number>,        // Sidereal ecliptic longitude (deg)
+            "rashi_sa": "<Sanskrit Rashi>",
+            "house": 1..12                    // House number relative to Lagna sign index
+          },
+          "Ketu": {
+            "longitude_deg": <number>,
+            "rashi_sa": "<Sanskrit Rashi>",
+            "house": 1..12
+          }
+        }
+      }
+
+    Errors:
+      - 400: Unknown location (not in CITY_DB) or serializer validation error.
+      - 500: Any unexpected computation error; message in 'error' field.
+
+    Notes:
+      - Ephemeris path is expected at folder "ephe" relative to the runtime.
+      - Sidereal calculation uses Swiss Ephemeris with flags: FLG_SWIEPH | FLG_SIDEREAL.
+      - The GET method is intended for simple health checks or readiness probes.
     """
+
+    def get(self, request):
+        """
+        GET /panchanga/
+
+        Health-check endpoint. Returns a simple OK status.
+        """
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
     def post(self, request):
         ser = PanchangaInputSerializer(data=request.data)
