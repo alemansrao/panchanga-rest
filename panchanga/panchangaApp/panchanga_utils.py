@@ -1,5 +1,4 @@
 # Projects/panchanga-rest/panchanga/panchangaApp/panchanga_utils.py
-# -*- coding: utf-8 -*-
 """
 Utility helpers for Panchanga & Kundali computations using Swiss Ephemeris.
 Focus: simplicity, readability, and safe timezone handling.
@@ -218,21 +217,6 @@ def rashi_name_en(idx: int) -> str:
     return RASHI_EN[idx]
 
 
-def dms(deg: float) -> str:
-    """Return D°MM'SS\" string for any absolute longitude."""
-    d = int(math.floor(deg))
-    m_float = (deg - d) * 60
-    m = int(math.floor(m_float))
-    s = int(round((m_float - m) * 60))
-    return f"{d}°{m:02d}'{s:02d}\""
-
-
-def dms_in_sign(lon: float) -> str:
-    """Return degrees within current sign as D°MM'SS\" (0..29°59'59\")."""
-    within = normalize(lon) % 30.0
-    return dms(within)
-
-
 # ---------------------------------------------------------------------
 # TIME ↔ JULIAN DAY HELPERS (TZ-AWARE)
 # ---------------------------------------------------------------------
@@ -391,9 +375,6 @@ def compute_nakshatra(jd_ut: float, tz_str: str | None = None):
 # ---------------------------------------------------------------------
 # PANCHANGA NAMES FROM LONGITUDES
 # ---------------------------------------------------------------------
-def nakshatra_name(moon_lon_sidereal: float):
-    idx = int(math.floor(normalize(moon_lon_sidereal) / (360.0 / 27.0)))  # 0..26
-    return NAKSHATRA[idx], idx + 1
 
 
 def nakshatra_pada(lon_sidereal: float):
@@ -403,13 +384,13 @@ def nakshatra_pada(lon_sidereal: float):
     name = NAKSHATRA[idx]
     within = normalize(lon_sidereal) % seg
     pada = int(within // (seg / 4.0)) + 1  # 1..4
-    return name, idx + 1, pada
+    return name, pada
 
 
 def yoga_name(sun_lon_sidereal: float, moon_lon_sidereal: float):
     val = normalize(sun_lon_sidereal + moon_lon_sidereal)
     idx = int(math.floor(val / (360.0 / 27.0)))
-    return YOGA[idx], idx + 1
+    return YOGA[idx]
 
 
 def tithi_name(sun_lon_sidereal: float, moon_lon_sidereal: float):
@@ -419,7 +400,7 @@ def tithi_name(sun_lon_sidereal: float, moon_lon_sidereal: float):
     base = TITHI_BASE[tithi_num - 1]
     if tithi_num not in (15, 30):  # 15=Purnima, 30=Amavasya already standalone
         return f"{phase} Paksha {base}", tithi_num
-    return base, tithi_num
+    return base
 
 
 def karana_name(sun_lon_sidereal: float, moon_lon_sidereal: float):
@@ -427,30 +408,16 @@ def karana_name(sun_lon_sidereal: float, moon_lon_sidereal: float):
     kf = normalize(moon_lon_sidereal - sun_lon_sidereal) / 6.0  # 0..60
     ki = int(math.floor(kf)) + 1  # 1..60
     if ki == 1:
-        return "Kimstughna", ki
+        return "Kimstughna"
     if 2 <= ki <= 57:
-        return KARANA_MOVABLE[(ki - 2) % 7], ki
+        return KARANA_MOVABLE[(ki - 2) % 7]
     if ki == 58:
-        return "Shakuni", ki
+        return "Shakuni"
     if ki == 59:
-        return "Chatushpada", ki
-    return "Naga", ki  # ki == 60
+        return "Chatushpada"
+    return "Naga"  # ki == 60
 
 
 def ayana_name(sun_lon_sidereal: float):
     si = sign_index(sun_lon_sidereal)  # 0..11
     return "Uttarayana" if si in {9, 10, 11, 0, 1, 2} else "Dakshinayana"
-
-
-# ---------------------------------------------------------------------
-# DIVISIONAL CHARTS
-# ---------------------------------------------------------------------
-def divisional_sign(lon_sidereal: float, divisions: int) -> int:
-    """
-    Generic varga computation (simple classical mapping).
-    Returns sign index 0..11 for the varga chart.
-    """
-    rasi = int(normalize(lon_sidereal) // 30)  # 0..11
-    part = int((normalize(lon_sidereal) % 30) // (30 / divisions))  # 0..(n-1)
-    return (rasi * divisions + part) % 12
-
