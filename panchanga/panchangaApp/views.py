@@ -235,7 +235,7 @@ class PanchangaAPI(APIView):
             # 7) Response
             # ---------------------------------------------------------
             resp = {
-                "date": dt_local.strftime("%Y-%m-%d"),
+                "date": dt_local.strftime("%d-%m-%Y"),
                 "time": dt_local.strftime("%H:%M"),
                 "weekday": dt_local.strftime("%A"),
                 "timezone": tz_str,

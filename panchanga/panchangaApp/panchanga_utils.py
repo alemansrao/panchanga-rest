@@ -28,36 +28,132 @@ swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
 # NAME MAPS
 # ---------------------------------------------------------------------
 RASHI_EN = [
-    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces",
 ]
 RASHI_SA = [
-    "Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "Kanya",
-    "Tula", "Vrishchika", "Dhanu", "Makara", "Kumbha", "Meena",
+    "Mesha",
+    "Vrishabha",
+    "Mithuna",
+    "Karka",
+    "Simha",
+    "Kanya",
+    "Tula",
+    "Vrishchika",
+    "Dhanu",
+    "Makara",
+    "Kumbha",
+    "Meena",
 ]
 NAKSHATRA = [
-    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra",
-    "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
-    "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
-    "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishtha",
-    "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
+    "Ashwini",
+    "Bharani",
+    "Krittika",
+    "Rohini",
+    "Mrigashirsha",
+    "Ardra",
+    "Punarvasu",
+    "Pushya",
+    "Ashlesha",
+    "Magha",
+    "Purva Phalguni",
+    "Uttara Phalguni",
+    "Hasta",
+    "Chitra",
+    "Swati",
+    "Vishakha",
+    "Anuradha",
+    "Jyeshtha",
+    "Mula",
+    "Purva Ashadha",
+    "Uttara Ashadha",
+    "Shravana",
+    "Dhanishtha",
+    "Shatabhisha",
+    "Purva Bhadrapada",
+    "Uttara Bhadrapada",
+    "Revati",
 ]
 YOGA = [
-    "Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda", "Sukarma",
-    "Dhriti", "Shula", "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana", "Vajra",
-    "Siddhi", "Vyatipata", "Variyan", "Parigha", "Shiva", "Siddha", "Sadhya", "Shubha",
-    "Shukla", "Brahma", "Indra", "Vaidhriti",
+    "Vishkambha",
+    "Priti",
+    "Ayushman",
+    "Saubhagya",
+    "Shobhana",
+    "Atiganda",
+    "Sukarma",
+    "Dhriti",
+    "Shula",
+    "Ganda",
+    "Vriddhi",
+    "Dhruva",
+    "Vyaghata",
+    "Harshana",
+    "Vajra",
+    "Siddhi",
+    "Vyatipata",
+    "Variyan",
+    "Parigha",
+    "Shiva",
+    "Siddha",
+    "Sadhya",
+    "Shubha",
+    "Shukla",
+    "Brahma",
+    "Indra",
+    "Vaidhriti",
 ]
 # Tithis (1..30). 1..15 Shukla; 16..30 Krishna (15=Purnima, 30=Amavasya)
 TITHI_BASE = [
-    "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi",
-    "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi",
-    "Trayodashi", "Chaturdashi", "Purnima", "Pratipada", "Dwitiya", "Tritiya",
-    "Chaturthi", "Panchami", "Shashthi", "Saptami", "Ashtami", "Navami",
-    "Dashami", "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Amavasya",
+    "Pratipada",
+    "Dwitiya",
+    "Tritiya",
+    "Chaturthi",
+    "Panchami",
+    "Shashthi",
+    "Saptami",
+    "Ashtami",
+    "Navami",
+    "Dashami",
+    "Ekadashi",
+    "Dwadashi",
+    "Trayodashi",
+    "Chaturdashi",
+    "Purnima",
+    "Pratipada",
+    "Dwitiya",
+    "Tritiya",
+    "Chaturthi",
+    "Panchami",
+    "Shashthi",
+    "Saptami",
+    "Ashtami",
+    "Navami",
+    "Dashami",
+    "Ekadashi",
+    "Dwadashi",
+    "Trayodashi",
+    "Chaturdashi",
+    "Amavasya",
 ]
 KARANA_MOVABLE = [
-    "Bava", "Balava", "Kaulava", "Taitila", "Garaja", "Vanija", "Vishti (Bhadra)",
+    "Bava",
+    "Balava",
+    "Kaulava",
+    "Taitila",
+    "Garaja",
+    "Vanija",
+    "Vishti (Bhadra)",
 ]
 
 # Default TZ fallback
@@ -77,19 +173,22 @@ def _ensure_tz(tz_str: str | None):
     return INDIA_TZ
 
 
-def _parse_date(date_str: str) -> datetime.date: # type: ignore
+def _parse_date(date_str: str) -> datetime.date:  # type: ignore
     """
     Accepts:
-      - YYYY-MM-DD  (ISO)
-      - DD/MM/YYYY  (common local)
+    - YYYY-MM-DD (ISO)
+    - DD/MM/YYYY (common local)
+    - DD-MM-YYYY  # NEW
     Returns a date() (no time).
     """
-    for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):  # added "%d-%m-%Y"
         try:
             return datetime.strptime(date_str, fmt).date()
         except ValueError:
             continue
-    raise ValueError(f"Unsupported date format: '{date_str}'. Use YYYY-MM-DD or DD/MM/YYYY.")
+    raise ValueError(
+        f"Unsupported date format: '{date_str}'. Use YYYY-MM-DD, DD/MM/YYYY, or DD-MM-YYYY."
+    )
 
 
 def _parse_time(time_str: str) -> tuple[int, int]:
@@ -162,8 +261,10 @@ def jd_at_midnight_local(date_str: str, tz_str: str | None = None) -> float:
     dt_local = tz.localize(datetime(d.year, d.month, d.day, 0, 0, 0))
     dt_utc = dt_local.astimezone(pytz.UTC)
     jd_ut = swe.julday(
-        dt_utc.year, dt_utc.month, dt_utc.day,
-        dt_utc.hour + dt_utc.minute / 60.0 + dt_utc.second / 3600.0
+        dt_utc.year,
+        dt_utc.month,
+        dt_utc.day,
+        dt_utc.hour + dt_utc.minute / 60.0 + dt_utc.second / 3600.0,
     )
     return jd_ut
 
@@ -191,7 +292,9 @@ def revjul_to_local(jd_ut: float, tz_str: str | None = None):
         d = 1
         hh = mm = ss = 0
 
-    dt_utc = pytz.UTC.localize(datetime(int(y), int(m), int(d), int(hh), int(mm), int(ss)))
+    dt_utc = pytz.UTC.localize(
+        datetime(int(y), int(m), int(d), int(hh), int(mm), int(ss))
+    )
     return dt_utc.astimezone(tz)
 
 
@@ -217,7 +320,9 @@ def _jd_to_local_string(jd_ut: float, tz_str: str | None = None) -> str:
     return revjul_to_local(jd_ut, tz_str).strftime("%d-%b-%Y %H:%M")
 
 
-def _find_crossing(target_deg: float, jd_start: float, direction: int, step=0.5, max_days=45):
+def _find_crossing(
+    target_deg: float, jd_start: float, direction: int, step=0.5, max_days=45
+):
     """
     Find JD where Moon longitude crosses target_deg near jd_start
     using sign-change detection + bisection. direction: +1 forward, -1 backward.
@@ -345,7 +450,7 @@ def divisional_sign(lon_sidereal: float, divisions: int) -> int:
     Generic varga computation (simple classical mapping).
     Returns sign index 0..11 for the varga chart.
     """
-    rasi = int(normalize(lon_sidereal) // 30)                # 0..11
+    rasi = int(normalize(lon_sidereal) // 30)  # 0..11
     part = int((normalize(lon_sidereal) % 30) // (30 / divisions))  # 0..(n-1)
     return (rasi * divisions + part) % 12
 
