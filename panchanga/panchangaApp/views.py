@@ -100,18 +100,6 @@ class PanchangaAPI(APIView):
         # -----------------------------
         # 1) Select AYANAMSA MODE
         # -----------------------------
-        AYANAMSA_MAP = {
-            "lahiri": swe.SIDM_LAHIRI,
-            "chitrapaksha": swe.SIDM_LAHIRI,
-            "raman": swe.SIDM_RAMAN,
-            "kp": swe.SIDM_KRISHNAMURTI,
-            "krishnamurti": swe.SIDM_KRISHNAMURTI,
-            "fagan": swe.SIDM_FAGAN_BRADLEY,
-            "fagan-bradley": swe.SIDM_FAGAN_BRADLEY,
-            "yukteswar": swe.SIDM_YUKTESHWAR,
-            "sassanian": swe.SIDM_SASSANIAN,
-            "surya_siddhanta": swe.SIDM_SURYASIDDHANTA,
-        }
 
         ayan_name = ("lahiri").lower()
 
@@ -185,6 +173,7 @@ class PanchangaAPI(APIView):
                     "rashi_sa": rashi_name_sa(si),
                     # "rashi_en": rashi_name_en(si),
                     "house": ((si - lagna_idx) % 12) + 1,
+                    "retrograde": xx[3] < 0,
                 }
 
             # Ketu = opposite Rahu
