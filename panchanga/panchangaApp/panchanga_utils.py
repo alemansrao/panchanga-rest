@@ -399,7 +399,7 @@ def tithi_name(sun_lon_sidereal: float, moon_lon_sidereal: float):
     phase = "Shukla" if tithi_num <= 15 else "Krishna"
     base = TITHI_BASE[tithi_num - 1]
     if tithi_num not in (15, 30):  # 15=Purnima, 30=Amavasya already standalone
-        return f"{phase} Paksha {base}", tithi_num
+        return f"{phase} Paksha {base}"
     return base
 
 
