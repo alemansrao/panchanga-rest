@@ -35,7 +35,9 @@ CITY_DB = {
 
 # ---- Swiss Ephemeris setup ----
 swe.set_ephe_path("ephe")  # Path to ephemeris folder
-FLAGS = swe.FLG_SWIEPH | swe.FLG_SIDEREAL  # For sidereal planetary longitudes
+FLAGS = (
+    swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
+)  # For sidereal planetary longitudes
 
 
 class PanchangaAPI(APIView):
@@ -186,6 +188,7 @@ class PanchangaAPI(APIView):
                 "rashi_sa": rashi_name_sa(ketu_si),
                 # "rashi_en": rashi_name_en(ketu_si),
                 "house": ((ketu_si - lagna_idx) % 12) + 1,
+                "retrograde": True,
             }
 
             # -----------------------------
