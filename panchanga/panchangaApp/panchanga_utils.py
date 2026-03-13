@@ -454,7 +454,3 @@ def divisional_sign(lon_sidereal: float, divisions: int) -> int:
     part = int((normalize(lon_sidereal) % 30) // (30 / divisions))  # 0..(n-1)
     return (rasi * divisions + part) % 12
 
-
-def navamsa(lon_sidereal: float) -> int:
-    """Convenience for D9 — returns sign index 0..11."""
-    return divisional_sign(lon_sidereal, 9)

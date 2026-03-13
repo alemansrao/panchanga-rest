@@ -35,7 +35,6 @@ from .panchanga_utils import (
     tithi_name,
     karana_name,
     ayana_name,
-    navamsa,
 )
 
 # ---------------------------------------------------------------------
@@ -165,8 +164,6 @@ class PanchangaAPI(APIView):
                 # Nakshatra + Pada
                 nak_name, nak_num, pada = nakshatra_pada(lon_sid)
 
-                # Navamsa (D9) sign (0..11) and name
-                d9_idx = navamsa(lon_sid)
 
                 planets[name] = {
                     "longitude_deg": round(lon_sid, 6),
@@ -182,11 +179,7 @@ class PanchangaAPI(APIView):
                         "number": nak_num,
                         "pada": pada,
                     },
-                    "navamsa": {
-                        "sign_index": d9_idx,
-                        "sign_sa": rashi_name_sa(d9_idx),
-                        "sign_en": rashi_name_en(d9_idx),
-                    },
+                    
                 }
 
             # Ketu = opposite Rahu
@@ -194,7 +187,6 @@ class PanchangaAPI(APIView):
             ketu_lon = normalize(rahu_lon + 180)
             ketu_si = sign_index(ketu_lon)
             ketu_nak_name, ketu_nak_num, ketu_pada = nakshatra_pada(ketu_lon)
-            ketu_d9_idx = navamsa(ketu_lon)
 
             planets["Ketu"] = {
                 "longitude_deg": round(ketu_lon, 6),
@@ -209,11 +201,7 @@ class PanchangaAPI(APIView):
                     "number": ketu_nak_num,
                     "pada": ketu_pada,
                 },
-                "navamsa": {
-                    "sign_index": ketu_d9_idx,
-                    "sign_sa": rashi_name_sa(ketu_d9_idx),
-                    "sign_en": rashi_name_en(ketu_d9_idx),
-                },
+                
             }
 
             # ---------------------------------------------------------
