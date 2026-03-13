@@ -32,6 +32,11 @@ from .panchanga_utils import (
     tithi_name,
     karana_name,
     ayana_name,
+    calculate_navamsa_pada,
+    navamsa_sign_index_from_abs,
+    navamsa_sign_en_from_abs,
+    navamsa_sign_sa_from_abs,
+    get_navamsa_lagna,
 )
 
 # ---------------------------------------------------------------------
@@ -195,6 +200,29 @@ class PanchangaAPI(APIView):
             }
 
             # ---------------------------------------------------------
+            # 5b) Navamsa (D9): per-planet sign + pada + house (D9)
+            #     Houses are relative to Navamsa Lagna.
+            # ---------------------------------------------------------
+            nav_lagna = get_navamsa_lagna(asc_sidereal)  # uses sidereal Asc absolute
+            nav_lagna_idx = nav_lagna["sign_index"]  # 0..11
+
+            navamsa = {}
+            for name, pdata in planets.items():
+                deg = pdata["longitude_deg"]  # D1 absolute sidereal longitude
+                nav_idx = navamsa_sign_index_from_abs(deg)
+                nav_house = ((nav_idx - nav_lagna_idx) % 12) + 1
+                navamsa[name] = {
+                    # Keeping a shape close to your planets object and example:
+                    "in_sign_sa": navamsa_sign_sa_from_abs(deg),
+                    "in_sign_en": navamsa_sign_en_from_abs(deg),
+                    "house": nav_house,
+                    # Useful extras:
+                    "sign_index": nav_idx,
+                    "sign_number": nav_idx + 1,
+                    "pada": calculate_navamsa_pada(deg),
+                }
+
+            # ---------------------------------------------------------
             # 6) Panchanga parameters
             # ---------------------------------------------------------
             sun_lon = planets["Sun"]["longitude_deg"]
@@ -238,6 +266,14 @@ class PanchangaAPI(APIView):
                 "sunrise": sr_local.strftime("%Y-%m-%d %H:%M"),
                 "sunset": ss_local.strftime("%Y-%m-%d %H:%M"),
                 "planets": planets,
+                "navamsa_lagna": {
+                    "sign_sa": nav_lagna["sign_sa"],
+                    "sign_en": nav_lagna["sign_en"],
+                    "sign_index": nav_lagna["sign_index"],
+                    "sign_number": nav_lagna["sign_number"],
+                    "pada": nav_lagna["pada"],
+                },
+                "Navamsa": navamsa,
             }
 
             return Response(resp, status=status.HTTP_200_OK)

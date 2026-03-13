@@ -22,7 +22,7 @@ import swisseph as swe
 # CONFIG: Sidereal mode (Lahiri) — commonly used in Indian astrology
 # ---------------------------------------------------------------------
 swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-
+NAVA_PART_DEG = 30.0 / 9.0  # 3°20'
 # ---------------------------------------------------------------------
 # NAME MAPS
 # ---------------------------------------------------------------------
@@ -421,3 +421,84 @@ def karana_name(sun_lon_sidereal: float, moon_lon_sidereal: float):
 def ayana_name(sun_lon_sidereal: float):
     si = sign_index(sun_lon_sidereal)  # 0..11
     return "Uttarayana" if si in {9, 10, 11, 0, 1, 2} else "Dakshinayana"
+
+
+# ---------------------------------------------------------------------
+# NAVAMSA (D9) HELPERS
+# ---------------------------------------------------------------------
+# Logic mirrors your provided TS implementation:
+# - pada = floor((deg_in_rasi + eps) / (30/9)) + 1  => 1..9
+# - Movable signs start from same sign (+0)
+# - Fixed signs start from 9th from sign (+8)
+# - Dual  signs start from 5th from sign (+4)
+# - Navamsa sign index = (sign_idx + baseOffset + (pada - 1)) % 12
+# ---------------------------------------------------------------------
+
+
+
+def _degree_in_rasi_from_abs(abs_deg: float) -> float:
+    """Degree inside the natal sign [0..30) from absolute sidereal longitude."""
+    return normalize(abs_deg) % 30.0
+
+def calculate_navamsa_pada(abs_longitude_deg: float) -> int:
+    """Return Navamsa pada (1..9) from absolute sidereal longitude."""
+    deg_in_rasi = _degree_in_rasi_from_abs(abs_longitude_deg)
+    return int((deg_in_rasi + 1e-10) // NAVA_PART_DEG) + 1  # 1..9
+
+def _rasi_modality(index: int) -> str:
+    """Return 'movable' | 'fixed' | 'dual' for rasi index 0..11 (Aries..Pisces)."""
+    i = index % 12
+    if i in (0, 3, 6, 9):
+        return "movable"
+    if i in (1, 4, 7, 10):
+        return "fixed"
+    return "dual"
+
+def navamsa_sign_index_from_abs(abs_longitude_deg: float) -> int:
+    """Navamsa sign index (0..11) from absolute sidereal longitude."""
+    si = sign_index(abs_longitude_deg)  # 0..11
+    pada = calculate_navamsa_pada(abs_longitude_deg)  # 1..9
+    modality = _rasi_modality(si)
+    base = 0 if modality == "movable" else (8 if modality == "fixed" else 4)
+    return (si + base + (pada - 1)) % 12
+
+def navamsa_sign_number_from_abs(abs_longitude_deg: float) -> int:
+    """Navamsa sign number (1..12)."""
+    return navamsa_sign_index_from_abs(abs_longitude_deg) + 1
+
+def navamsa_sign_en_from_abs(abs_longitude_deg: float) -> str:
+    """Navamsa sign English name."""
+    return RASHI_EN[navamsa_sign_index_from_abs(abs_longitude_deg)]
+
+def navamsa_sign_sa_from_abs(abs_longitude_deg: float) -> str:
+    """Navamsa sign Sanskrit name."""
+    return RASHI_SA[navamsa_sign_index_from_abs(abs_longitude_deg)]
+
+def get_navamsa_info_from_abs(abs_longitude_deg: float) -> dict:
+    """Detailed D9 info for a given absolute sidereal longitude."""
+    natal_idx = sign_index(abs_longitude_deg)
+    deg_in_rasi = _degree_in_rasi_from_abs(abs_longitude_deg)
+    pada = calculate_navamsa_pada(abs_longitude_deg)
+    nav_idx = navamsa_sign_index_from_abs(abs_longitude_deg)
+    return {
+        "rasi_index": natal_idx,                    # 0..11 in D1
+        "rasi_en": RASHI_EN[natal_idx],
+        "rasi_sa": RASHI_SA[natal_idx],
+        "degree_in_rasi": deg_in_rasi,              # 0..30
+        "pada": pada,                               # 1..9
+        "navamsa_sign_index": nav_idx,              # 0..11
+        "navamsa_sign_number": nav_idx + 1,         # 1..12
+        "navamsa_sign_en": RASHI_EN[nav_idx],
+        "navamsa_sign_sa": RASHI_SA[nav_idx],
+    }
+
+def get_navamsa_lagna(abs_longitude_deg: float) -> dict:
+    """Navamsa Lagna from absolute sidereal Lagna longitude."""
+    info = get_navamsa_info_from_abs(abs_longitude_deg)
+    return {
+        "pada": info["pada"],
+        "sign_index": info["navamsa_sign_index"],
+        "sign_number": info["navamsa_sign_number"],
+        "sign_en": info["navamsa_sign_en"],
+        "sign_sa": info["navamsa_sign_sa"],
+    }
